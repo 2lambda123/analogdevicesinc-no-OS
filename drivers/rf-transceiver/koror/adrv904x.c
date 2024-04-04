@@ -242,9 +242,6 @@ int adrv904x_jesd204_link_pre_setup(struct jesd204_dev *jdev,
 		return -EINVAL;
 	}
 
-	uint64_t r = 0;
-	no_os_clk_recalc_rate(phy->dev_clk, &r);
-
 	return JESD204_STATE_CHANGE_DONE;
 }
 
@@ -423,12 +420,12 @@ int adrv904x_jesd204_link_setup(struct jesd204_dev *jdev,
 //		return JESD204_STATE_CHANGE_ERROR;
 //	}
 //
-//	recoveryAction = adi_adrv904x_MultichipSyncSet(phy->kororDevice, ADI_ENABLE);
-//	if (recoveryAction != ADI_ADRV904X_ERR_ACT_NONE) {
-//		pr_err("ERROR adi_adrv904x_MultichipSyncSet failed in %s at line %d.\n",
-//		       __func__, __LINE__);
-//		return JESD204_STATE_CHANGE_ERROR;
-//	}
+	recoveryAction = adi_adrv904x_MultichipSyncSet(phy->kororDevice, ADI_ENABLE);
+	if (recoveryAction != ADI_ADRV904X_ERR_ACT_NONE) {
+		pr_err("ERROR adi_adrv904x_MultichipSyncSet failed in %s at line %d.\n",
+		       __func__, __LINE__);
+		return JESD204_STATE_CHANGE_ERROR;
+	}
 
 	return JESD204_STATE_CHANGE_DONE;
 }
