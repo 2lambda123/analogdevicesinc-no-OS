@@ -901,8 +901,9 @@ static int adrv904x_jesd204_post_running_stage(struct jesd204_dev *jdev,
 // 	if (ret)
 // 		return adrv9025_dev_err(phy);
 
- 	no_os_clk_set_rate(phy->clks[ADRV904X_RX_SAMPL_CLK], phy->rx_iqRate_kHz * 1000);
- 	no_os_clk_set_rate(phy->clks[ADRV904X_TX_SAMPL_CLK], phy->tx_iqRate_kHz * 1000);
+ 	// ToDo - fix this also on Madura, this is not OK
+// 	no_os_clk_set_rate(phy->clks[ADRV904X_RX_SAMPL_CLK], phy->rx_iqRate_kHz * 1000);
+// 	no_os_clk_set_rate(phy->clks[ADRV904X_TX_SAMPL_CLK], phy->tx_iqRate_kHz * 1000);
 
  	ret = adi_adrv904x_RxTxEnableSet(phy->kororDevice, 0x00, 0x00, ADI_ADRV904X_RX_MASK_ALL, ADI_ADRV904X_RX_MASK_ALL, ADI_ADRV904X_TX0 | ADI_ADRV904X_TX7, ADI_ADRV904X_TX0 | ADI_ADRV904X_TX7);
 	if (ret) {
