@@ -1205,6 +1205,7 @@ int adrv904x_setup(struct adrv904x_rf_phy *phy)
 	struct no_os_clk_desc *rx_sample_clk = NULL;
 	struct no_os_clk_desc *tx_sample_clk = NULL;
 	struct no_os_clk_init_param clk_init;
+	const char *dev_name = "ADRV9040";
 	adi_adrv904x_Version_t apiVersion;
 	adi_common_ErrData_t* errPtr;
 	uint8_t siRevision = 0xbb;
@@ -1227,6 +1228,9 @@ int adrv904x_setup(struct adrv904x_rf_phy *phy)
 		return -ENOMEM;
 
 	phy->kororDevice->common.errPtr = errPtr;
+	phy->kororDevice->common.deviceInfo.id = 1;
+	phy->kororDevice->common.deviceInfo.name = dev_name;
+	phy->kororDevice->common.deviceInfo.type = 0x00;
 
 	ret = adi_adrv904x_HwOpen(phy->kororDevice, adrv904x_spi_settings_get());
 	if (ret)
