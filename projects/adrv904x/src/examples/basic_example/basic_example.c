@@ -359,7 +359,7 @@ int basic_example_main(void)
 //	axi_dac_load_custom_data(phy->tx_dac, sine_lut_iq,
 //					 NO_OS_ARRAY_SIZE(sine_lut_iq),
 //					 (uintptr_t)dac_buffer_dma);
-
+//
 //	uint32_t data;
 //	no_os_axi_io_read(0x9C450000, 0x0010, &data);
 //	printf("	Rx data offload SYNTHESIS_CONFIG %#x\n", data);
@@ -530,11 +530,21 @@ int basic_example_main(void)
 //
 //	/* Flush cache data. */
 //	Xil_DCacheInvalidateRange((uintptr_t)dac_buffer_dma, sizeof(sine_lut_iq));
-//
-//	no_os_mdelay(1000);
 
-	axi_jesd204_tx_status_read(tx_jesd);
-	axi_jesd204_rx_status_read(rx_jesd);
+//	adi_adrv904x_DeframerStatus_v2_t deframerStatus;
+//	while(1) {
+//		no_os_mdelay(1000);
+//
+//		axi_jesd204_tx_status_read(tx_jesd);
+//		axi_jesd204_rx_status_read(rx_jesd);
+//
+//		adi_adrv904x_DeframerStatusGet_v2(phy->kororDevice,
+//				ADI_ADRV904X_DEFRAMER_0, &deframerStatus);
+//		for(int i = 0; i < 8; i++) {
+//		 			pr_warning("Link%u deframerStatus %d laneStatus 0x%X\n",
+//		  				   0, i,  deframerStatus.laneStatus[i]);
+//		}
+//	}
 
 	 struct axi_dma_transfer read_transfer = {
 			 // Number of bytes to write/read
@@ -564,7 +574,7 @@ int basic_example_main(void)
 			 8 * sizeof(adc_buffer_dma[0]));
 
 
-	while(1);
+//	while(1);
 
 	jesd204_fsm_stop(topology, JESD204_LINKS_ALL);
 
