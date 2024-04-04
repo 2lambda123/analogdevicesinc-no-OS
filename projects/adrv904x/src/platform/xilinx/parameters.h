@@ -98,10 +98,17 @@
 #define AD9528_CS			1
 #define ADRV9040_CS			0
 
+#ifndef PLATFORM_MB
 #define DAC_GPIO_PLDDR_BYPASS	        (GPIO_OFFSET + 70)
 #define AD9528_RESET_B			(GPIO_OFFSET + 69)
 #define AD9528_SYSREF_REQ		(GPIO_OFFSET + 68)
 #define ADRV9040_RESET_B		(GPIO_OFFSET + 56)
+#else
+#define DAC_GPIO_PLDDR_BYPASS	        (GPIO_OFFSET + 63)
+#define AD9528_RESET_B			(GPIO_OFFSET + 62)
+#define AD9528_SYSREF_REQ		(GPIO_OFFSET + 61)
+#define ADRV9040_RESET_B		(GPIO_OFFSET + 49)
+#endif
 
 extern struct xil_spi_init_param spi_extra;
 extern struct xil_gpio_init_param xil_gpio_param;
