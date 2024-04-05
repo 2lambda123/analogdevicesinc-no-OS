@@ -94,6 +94,7 @@ struct adrv904x_rf_phy {
 	void					*lock;
 	uint32_t				tx_iqRate_kHz;
 	uint32_t				rx_iqRate_kHz;
+	uint32_t				orx_iqRate_kHz;
 
 	struct no_os_clk_desc			*dev_clk;
 

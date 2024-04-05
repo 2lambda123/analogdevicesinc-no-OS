@@ -901,7 +901,6 @@ static int adrv904x_jesd204_post_running_stage(struct jesd204_dev *jdev,
 // 	if (ret)
 // 		return adrv9025_dev_err(phy);
 
- 	// ToDo - fix this also on Madura, this is not OK
 // 	no_os_clk_set_rate(phy->clks[ADRV904X_RX_SAMPL_CLK], phy->rx_iqRate_kHz * 1000);
 // 	no_os_clk_set_rate(phy->clks[ADRV904X_TX_SAMPL_CLK], phy->tx_iqRate_kHz * 1000);
 
@@ -1154,26 +1153,26 @@ error:
 static int32_t adrv9040_bb_recalc_rate(struct no_os_clk_desc *desc,
 				       uint64_t *rate)
 {
-	struct adrv904x_rf_phy *adrv9040_dev;
-	uint64_t read_rate = 0;
-	int ret;
+	struct adrv904x_rf_phy *adrv904x_dev;
+	adrv904x_dev = desc->dev_desc;
 
-	adrv9040_dev = desc->dev_desc;
+	if (!strcmp(desc->name, "-rx_sampl_clk"))
+		*rate = adrv904x_dev->rx_iqRate_kHz;
+	else if (!strcmp(desc->name, "-tx_sampl_clk"))
+		*rate = adrv904x_dev->tx_iqRate_kHz;
+	else if (!strcmp(desc->name, "-orx_sampl_clk"))
+		*rate = adrv904x_dev->orx_iqRate_kHz;
+	else
+		return -EINVAL;
 
-	ret = no_os_clk_recalc_rate(adrv9040_dev->dev_clk, &read_rate);
-	if (!ret)
-		*rate = read_rate;
-
-	return ret;
+	return 0;
 }
 
 static int32_t adrv9040_bb_set_rate(struct no_os_clk_desc *desc,
 				    uint64_t rate)
 {
-	struct adrv904x_rf_phy *adrv9040_dev;
-	adrv9040_dev = desc->dev_desc;
-
-	return no_os_clk_set_rate(adrv9040_dev->dev_clk, rate);
+	// Do nothing
+	return 0;
 }
 
 static int32_t adrv9040_bb_round_rate(struct no_os_clk_desc *desc,
