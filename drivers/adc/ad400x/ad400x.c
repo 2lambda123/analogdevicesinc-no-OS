@@ -246,6 +246,21 @@ int32_t ad400x_init(struct ad400x_dev **device,
 	struct spi_engine_init_param *spi_eng_ip = init_param->spi_init.extra;
 
 	spi_engine_set_transfer_width(dev->spi_desc, spi_eng_ip->data_width);
+	ret = axi_clkgen_init(&dev->clkgen, init_param->clkgen_init);
+	if (ret)
+		goto error;
+
+	ret = axi_clkgen_init(&dev->clkgen, init_param->clkgen_init);
+	if (ret)
+		goto error;
+
+	ret = axi_clkgen_set_rate(dev->clkgen, init_param->axi_clkgen_rate);
+	if (ret)
+		goto error;
+
+	ret = no_os_pwm_init(&dev->trigger_pwm_desc, init_param->trigger_pwm_init);
+	if (ret)
+		goto error;
 #endif
 
 	ad400x_spi_reg_read(dev, &data);
@@ -279,6 +294,18 @@ int32_t ad400x_remove(struct ad400x_dev *dev)
 #if defined(USE_STANDARD_SPI)
 	if (dev->gpio_cnv) {
 		ret = no_os_gpio_remove(dev->gpio_cnv);
+		if (ret)
+			return ret;
+	}
+#else
+	if (dev->clkgen) {
+		ret = axi_clkgen_remove(dev->clkgen);
+		if (ret)
+			return ret;
+	}
+
+	if (dev->trigger_pwm_desc) {
+		ret = no_os_pwm_remove(dev->trigger_pwm_desc);
 		if (ret)
 			return ret;
 	}
