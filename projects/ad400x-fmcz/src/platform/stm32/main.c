@@ -1,6 +1,6 @@
 /***************************************************************************//**
  *   @file   main.c
- *   @brief  Main file for xilinx platform of iio_demo project.
+ *   @brief  Main file for STM32 platform of eval-ad400x project.
  *   @author Axel Haslam (ahaslam@baylibre.com)
 ********************************************************************************
  * Copyright 2024(c) Analog Devices, Inc.
@@ -44,32 +44,24 @@
 #include "common_data.h"
 #include "no_os_error.h"
 
-#ifdef BASIC_EXAMPLE
-#include "basic_example.h"
-#elif IIO_EXAMPLE
+#ifdef IIO_EXAMPLE
 #include "iio_example.h"
 #endif
 
-
 /***************************************************************************//**
- * @brief Main function execution for xilinx platform.
+ * @brief Main function execution for STM32 platform.
  *
  * @return ret - Result of the enabled examples execution.
 *******************************************************************************/
+
 int main()
 {
-	int ret = -EINVAL;
-
-	/* Enable the instruction cache. */
-	Xil_ICacheEnable();
-	/* Enable the data cache. */
-	Xil_DCacheEnable();
-
-#ifdef BASIC_EXAMPLE
-	ret = basic_example_main();
-#elif IIO_EXAMPLE
-	ret = iio_example_main();
+	stm32_init();
+#ifdef IIO_EXAMPLE
+	return iio_example_main();
+#elif BASIC_EXAMPLE
+	return basic_example_main();
+#else
+#error At least one example has to be selected using y value in Makefile.
 #endif
-
-	return ret;
 }

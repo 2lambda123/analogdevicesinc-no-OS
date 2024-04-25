@@ -1,6 +1,6 @@
 /***************************************************************************//**
- *   @file   main.c
- *   @brief  Main file for xilinx platform of iio_demo project.
+ *   @file   parameters.c
+ *   @brief  Definition of STM32 platform data used by eval-ad400x project.
  *   @author Axel Haslam (ahaslam@baylibre.com)
 ********************************************************************************
  * Copyright 2024(c) Analog Devices, Inc.
@@ -40,36 +40,18 @@
 /******************************************************************************/
 /***************************** Include Files **********************************/
 /******************************************************************************/
-#include "platform_includes.h"
-#include "common_data.h"
-#include "no_os_error.h"
+#include "parameters.h"
 
-#ifdef BASIC_EXAMPLE
-#include "basic_example.h"
-#elif IIO_EXAMPLE
-#include "iio_example.h"
-#endif
+/******************************************************************************/
+/********************** Macros and Constants Definitions **********************/
+/******************************************************************************/
+uint8_t in_buff[MAX_SIZE_BASE_ADDR] = {0};
 
+struct stm32_uart_init_param ad400x_uart_extra_ip = {
+	.huart = &huart5,
+};
 
-/***************************************************************************//**
- * @brief Main function execution for xilinx platform.
- *
- * @return ret - Result of the enabled examples execution.
-*******************************************************************************/
-int main()
-{
-	int ret = -EINVAL;
-
-	/* Enable the instruction cache. */
-	Xil_ICacheEnable();
-	/* Enable the data cache. */
-	Xil_DCacheEnable();
-
-#ifdef BASIC_EXAMPLE
-	ret = basic_example_main();
-#elif IIO_EXAMPLE
-	ret = iio_example_main();
-#endif
-
-	return ret;
-}
+struct stm32_spi_init_param ad400x_spi_extra_ip  = {
+	.chip_select_port = SPI_CS_PORT,
+	.get_input_clock = HAL_RCC_GetPCLK2Freq,
+};

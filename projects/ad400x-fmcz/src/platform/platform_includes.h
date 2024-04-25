@@ -44,6 +44,12 @@
 /******************************************************************************/
 #ifdef XILINX_PLATFORM
 #include "xilinx/parameters.h"
+#elif defined STM32_PLATFORM
+#include "stm32/parameters.h"
+#endif
+
+#ifdef IIO_SUPPORT
+#include "iio_app.h"
 #endif
 
 #endif /* __PLATFORM_INCLUDES_H__ */
