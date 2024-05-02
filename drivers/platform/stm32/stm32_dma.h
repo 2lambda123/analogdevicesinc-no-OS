@@ -1,9 +1,10 @@
 /***************************************************************************//**
- *   @file   stm32/stm32_spi.h
- *   @brief  Header file for the stm32 spi driver.
- *   @author Darius Berghe (darius.berghe@analog.com)
+ *   @file   stm32_dma.h
+ *   @brief  Platform independent function definitions and data types
+ * 	     for the DMA API.
+ * 	 @author Janani Sunil (janani.sunil@analog.com)
 ********************************************************************************
- * Copyright 2020(c) Analog Devices, Inc.
+ * Copyright 2024(c) Analog Devices, Inc.
  *
  * All rights reserved.
  *
@@ -36,65 +37,70 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************/
-#ifndef STM32_SPI_H_
-#define STM32_SPI_H_
 
-#include <stdint.h>
-#include "no_os_spi.h"
+#ifndef STM32_DMA_H_
+#define STM32_DMA_H_
+
 #include "no_os_dma.h"
 #include "stm32_hal.h"
-#ifdef HAL_TIM_MODULE_ENABLED
-#include "stm32_pwm.h"
-#endif
 
 /**
- * @struct stm32_spi_init_param
- * @brief Structure holding the initialization parameters for stm32 platform
- * specific SPI parameters.
+ * @enum stm32_dma_data_alignment
+ * @brief DMA Data alignment
  */
-struct stm32_spi_init_param {
-	/** Chip select port */
-	uint32_t chip_select_port;
-	/** Get perihperal source clock function */
-	uint32_t (*get_input_clock)(void);
-	/** DMA Initialization Parameters */
-	struct no_os_dma_init_param* dma_init;
-	/** RX DMA Channel Descriptor */
-	struct no_os_dma_ch* rxdma_ch;
-	/** TX DMA Channel Descriptor */
-	struct no_os_dma_ch* txdma_ch;
-#ifdef HAL_TIM_MODULE_ENABLED
-	/** CS PWM Initialization Parameters */
-	const struct no_os_pwm_init *pwm_init;
-#endif
+enum stm32_dma_data_alignment {
+	DATA_ALIGN_BYTE = 0,
+	DATA_ALIGN_HALF_WORD = 1,
+	DATA_ALIGN_WORD = 2
 };
 
 /**
- * @struct stm32_spi_desc
- * @brief stm32 platform specific SPI descriptor
+ * @enum stm32_dma_mode
+ * @brief DMA Data Modes
  */
-struct stm32_spi_desc {
-	/** SPI instance */
-	SPI_HandleTypeDef hspi;
-	/** SPI input clock */
-	uint32_t input_clock;
-	/** Chip select gpio descriptor */
-	struct no_os_gpio_desc *chip_select;
-	/** DMA Descriptor */
-	struct no_os_dma_desc* dma_desc;
-	/** RX DMA Channel Descriptor */
-	struct no_os_dma_ch* rxdma_ch;
-	/** TX DMA Channel Descriptor */
-	struct no_os_dma_ch* txdma_ch;
-#ifdef HAL_TIM_MODULE_ENABLED
-	/** CS PWM descriptor */
-	struct no_os_pwm_desc* pwm_desc;
-#endif
+enum stm32_dma_mode {
+	DMA_NORMAL_MODE = 0,
+	DMA_CIRCULAR_MODE = 1
 };
 
 /**
- * @brief stm32 specific SPI platform ops structure
+ * @struct stm32_dma_channel
+ * @brief STM32 DMA Channels
  */
-extern const struct no_os_spi_platform_ops stm32_spi_ops;
+struct stm32_dma_channel {
+	/* DMA Handle */
+	DMA_HandleTypeDef *hdma;
+	/* Channel Number */
+	uint32_t ch_num;
+	/* Memory Increment */
+	bool mem_increment;
+	/* Peripheral Increment */
+	bool per_increment;
+	/* Memory Data Alignment */
+	enum stm32_dma_data_alignment mem_data_alignment;
+	/* Peripheral Data Alignment */
+	enum stm32_dma_data_alignment per_data_alignment;
+	/* DMA Mode */
+	enum stm32_dma_mode dma_mode;
+	/* Source Address for the data */
+	uint8_t* src;
+	/* Destination Address for the data */
+	uint8_t* dst;
+	/* Transfer length in Bytes */
+	uint32_t length;
+};
 
-#endif // STM32_SPI_H_
+struct stm32_dma_init_param {
+	/* DMA Channel descriptor */
+	struct stm32_dma_channel *chn;
+};
+
+struct stm32_dma_desc {
+	/* DMA Channel Descriptor */
+	struct stm32_dma_channel* chn;
+};
+
+extern const struct no_os_dma_platform_ops stm32_dma_ops;
+
+#endif
+
