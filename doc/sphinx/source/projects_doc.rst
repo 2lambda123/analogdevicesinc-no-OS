@@ -56,6 +56,7 @@ ADC
    :maxdepth: 1
 
    projects/ad7616-st
+   projects/ad400x-fmcz
 
 POWER MANAGEMENT
 ================
