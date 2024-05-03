@@ -50,8 +50,8 @@
 /******************************************************************************/
 /********************** Macros and Constants Definitions **********************/
 /******************************************************************************/
-#define AD5460_CRC_POLYNOMIAL 	0x7
-#define AD5460_DIN_DEBOUNCE_LEN 	NO_OS_BIT(5)
+#define AD5460_CRC_POLYNOMIAL		0x7
+#define AD5460_DIN_DEBOUNCE_LEN		NO_OS_BIT(5)
 #define AD77416H_DEV_ADDRESS_MSK	NO_OS_GENMASK(5, 4)
 
 /******************************************************************************/
@@ -75,6 +75,12 @@ int ad5460_dac_voltage_to_code(struct ad5460_desc *desc, int32_t mvolts,
 			       uint16_t *code, uint32_t ch)
 {
 	uint32_t range, offset;
+
+	if (!desc)
+		return -ENODEV;
+
+	if (!code)
+		return -EINVAL;
 
 	switch (desc->channel_configs[ch].vout_range) {
 	case AD5460_VOUT_RANGE_0_12V:
@@ -110,6 +116,12 @@ int ad5460_dac_current_to_code(struct ad5460_desc *desc, uint32_t uamps,
 			       uint16_t *code, uint32_t ch)
 {
 	uint32_t range, offset;
+
+	if (!desc)
+		return -ENODEV;
+
+	if (!code)
+		return -EINVAL;
 
 	switch (desc->channel_configs[ch].iout_range) {
 	case AD5460_IOUT_RANGE_0_25MA:
@@ -166,6 +178,9 @@ int ad5460_reg_read_raw(struct ad5460_desc *desc, uint32_t addr,
 			uint8_t *val)
 {
 	int ret;
+
+	if (!desc)
+		return -ENODEV;
 	/**
 	 * Reading a register on AD5460 requires writing the address to the READ_SELECT
 	 * register first and then doing another spi read, which will contain the requested
@@ -195,6 +210,9 @@ int ad5460_reg_read_raw(struct ad5460_desc *desc, uint32_t addr,
  */
 int ad5460_reg_write(struct ad5460_desc *desc, uint32_t addr, uint16_t val)
 {
+	if (!desc)
+		return -ENODEV;
+
 	ad5460_format_reg_write(desc->dev_addr, addr, val, desc->comm_buff);
 
 	return no_os_spi_write_and_read(desc->spi_desc, desc->comm_buff,
@@ -213,13 +231,16 @@ int ad5460_reg_read(struct ad5460_desc *desc, uint32_t addr, uint16_t *val)
 	int ret;
 	uint8_t expected_crc;
 
+	if (!desc)
+		return -ENODEV;
+
 	ret = ad5460_reg_read_raw(desc, addr, desc->comm_buff);
 	if (ret)
 		return ret;
 
 	expected_crc = no_os_crc8(_crc_table, desc->comm_buff, 4, 0);
 	if (expected_crc != desc->comm_buff[4])
-		return -EINVAL;
+		return -EIO;
 
 	*val = no_os_get_unaligned_be16(&desc->comm_buff[2]);
 
@@ -240,6 +261,9 @@ int ad5460_reg_update(struct ad5460_desc *desc, uint32_t addr,
 {
 	int ret;
 	uint16_t data;
+
+	if (!desc)
+		return -ENODEV;
 
 	ret = ad5460_reg_read(desc, addr, &data);
 	if (ret)
@@ -262,6 +286,9 @@ int ad5460_set_channel_function(struct ad5460_desc *desc,
 				uint32_t ch, enum ad5460_op_mode ch_func)
 {
 	int ret;
+
+	if (!desc)
+		return -ENODEV;
 
 	ret = ad5460_reg_update(desc, AD5460_CH_FUNC_SETUP(ch),
 				AD5460_CH_FUNC_SETUP_MSK, AD5460_HIGH_Z);
@@ -293,6 +320,9 @@ int ad5460_set_channel_vout_range(struct ad5460_desc *desc, uint32_t ch,
 {
 	int ret;
 
+	if (!desc)
+		return -ENODEV;
+
 	ret = ad5460_reg_update(desc, AD5460_OUTPUT_CONFIG(ch),
 				AD5460_VOUT_RANGE_MSK, vout_range);
 	if (ret)
@@ -315,6 +345,9 @@ int ad5460_set_channel_iout_range(struct ad5460_desc *desc, uint32_t ch,
 {
 	int ret;
 
+	if (!desc)
+		return -ENODEV;
+
 	ret = ad5460_reg_update(desc, AD5460_OUTPUT_CONFIG(ch),
 				AD5460_IOUT_RANGE_MSK, iout_range);
 	if (ret)
@@ -336,6 +369,10 @@ int ad5460_set_channel_i_limit(struct ad5460_desc *desc,
 			       uint32_t ch, enum ad5460_i_limit i_limit)
 {
 	int ret;
+
+	if (!desc)
+		return -ENODEV;
+
 	ret = ad5460_reg_update(desc, AD5460_OUTPUT_CONFIG(ch),
 				AD5460_I_LIMIT_MSK, i_limit);
 	if (ret)
@@ -356,6 +393,9 @@ int ad5460_set_channel_i_limit(struct ad5460_desc *desc,
 int ad5460_set_channel_dac_code(struct ad5460_desc *desc, uint32_t ch,
 				uint16_t dac_code)
 {
+	if (!desc)
+		return -ENODEV;
+
 	return ad5460_reg_write(desc, AD5460_DAC_CODE(ch), dac_code);
 }
 
@@ -369,6 +409,9 @@ int ad5460_set_channel_dac_code(struct ad5460_desc *desc, uint32_t ch,
 int ad5460_set_diag(struct ad5460_desc *desc, uint32_t ch,
 		    enum ad5460_diag_mode diag_code)
 {
+	if (!desc)
+		return -ENODEV;
+
 	return ad5460_reg_write(desc, AD5460_DIAG_CONFIG, diag_code);
 }
 
@@ -382,6 +425,9 @@ int ad5460_set_diag(struct ad5460_desc *desc, uint32_t ch,
 int ad5460_set_gpio_config(struct ad5460_desc *desc, uint32_t ch,
 			   enum ad5460_gpio_select config)
 {
+	if (!desc)
+		return -ENODEV;
+
 	return ad5460_reg_update(desc, AD5460_GPIO_CONFIG(ch),
 				 AD5460_GPIO_SELECT_MSK, config);
 }
@@ -396,6 +442,9 @@ int ad5460_set_gpio_config(struct ad5460_desc *desc, uint32_t ch,
 int ad5460_gpio_set(struct ad5460_desc *desc, uint32_t ch, uint8_t val)
 {
 	int ret;
+
+	if (!desc)
+		return -ENODEV;
 
 	ret = ad5460_set_gpio_config(desc, ch, AD5460_GPIO_SEL_GPIO);
 	if (ret)
@@ -417,6 +466,9 @@ int ad5460_gpio_get(struct ad5460_desc *desc, uint32_t ch, uint8_t *val)
 	int ret;
 	uint16_t reg;
 
+	if (!desc)
+		return -ENODEV;
+
 	ret = ad5460_reg_read(desc, AD5460_GPIO_CONFIG(ch), &reg);
 	if (ret)
 		return ret;
@@ -435,6 +487,9 @@ int ad5460_gpio_get(struct ad5460_desc *desc, uint32_t ch, uint8_t *val)
 int ad5460_get_live(struct ad5460_desc *desc,
 		    union ad5460_live_status *status)
 {
+	if (!desc)
+		return -ENODEV;
+
 	return ad5460_reg_read(desc, AD5460_LIVE_STATUS, &status->value);
 }
 
@@ -451,6 +506,9 @@ int ad5460_dac_slew_enable(struct ad5460_desc *desc, uint32_t ch,
 			   enum ad5460_lin_rate rate)
 {
 	int ret;
+
+	if (!desc)
+		return -ENODEV;
 
 	ret = ad5460_reg_update(desc, AD5460_OUTPUT_CONFIG(ch),
 				AD5460_SLEW_LIN_STEP_MSK, step);
@@ -474,6 +532,9 @@ int ad5460_dac_slew_enable(struct ad5460_desc *desc, uint32_t ch,
  */
 int ad5460_dac_slew_disable(struct ad5460_desc *desc, uint32_t ch)
 {
+	if (!desc)
+		return -ENODEV;
+
 	return ad5460_reg_update(desc, AD5460_OUTPUT_CONFIG(ch),
 				 AD5460_SLEW_EN_MSK, 0);
 }
@@ -488,6 +549,9 @@ int ad5460_dac_slew_disable(struct ad5460_desc *desc, uint32_t ch)
  */
 int ad5460_set_therm_rst(struct ad5460_desc *desc, bool enable)
 {
+	if (!desc)
+		return -ENODEV;
+
 	return ad5460_reg_write(desc, AD5460_THERM_RST, enable);
 }
 
@@ -499,6 +563,9 @@ int ad5460_set_therm_rst(struct ad5460_desc *desc, bool enable)
 int ad5460_reset(struct ad5460_desc *desc)
 {
 	int ret;
+
+	if (!desc)
+		return -ENODEV;
 
 	if (desc->reset_gpio) {
 		ret = no_os_gpio_direction_output(desc->reset_gpio,
@@ -536,6 +603,9 @@ static int ad5460_scratch_test(struct ad5460_desc *desc)
 	int ret;
 	uint16_t val;
 	uint16_t test_val = 0x1234;
+
+	if (!desc)
+		return -ENODEV;
 
 	ret = ad5460_reg_write(desc, AD5460_SCRATCH(0), test_val);
 	if (ret)
@@ -581,25 +651,23 @@ int ad5460_init(struct ad5460_desc **desc,
 	ret = no_os_gpio_get_optional(&descriptor->reset_gpio,
 				      init_param->reset_gpio_param);
 	if (ret)
-		goto comm_err;
+		goto err;
 
 	ret = ad5460_reset(descriptor);
 	if (ret)
-		goto gpio_err;
+		goto err;
 
 	ret = ad5460_scratch_test(descriptor);
 	if (ret)
-		goto gpio_err;
+		goto err;
 
 	*desc = descriptor;
 
 	return 0;
 
-gpio_err:
-	no_os_gpio_remove(descriptor->reset_gpio);
-comm_err:
-	no_os_spi_remove(descriptor->spi_desc);
 err:
+	no_os_gpio_remove(descriptor->reset_gpio);
+	no_os_spi_remove(descriptor->spi_desc);
 	no_os_free(descriptor);
 
 	return ret;
@@ -617,19 +685,13 @@ int ad5460_remove(struct ad5460_desc *desc)
 	if (!desc)
 		return -EINVAL;
 
-	if (desc->reset_gpio) {
-		ret = no_os_gpio_remove(desc->reset_gpio);
-		if (ret)
-			return ret;
-
-		desc->reset_gpio = NULL;
-	}
+	ret = no_os_gpio_remove(desc->reset_gpio);
+	if (ret)
+		return ret;
 
 	ret = no_os_spi_remove(desc->spi_desc);
 	if (ret)
 		return ret;
-
-	desc->spi_desc = NULL;
 
 	no_os_free(desc);
 

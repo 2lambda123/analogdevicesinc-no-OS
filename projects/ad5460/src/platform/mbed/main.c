@@ -61,16 +61,13 @@ int main()
 #ifdef BASIC_EXAMPLE
 	struct no_os_uart_desc* uart;
 	ret = no_os_uart_init(&uart, &ad5460_uart_ip);
-	if (ret) {
-		no_os_uart_remove(uart);
+	if (ret)
 		return ret;
-	}
 	no_os_uart_stdio(uart);
 	ret = basic_example_main();
-	if (ret) {
-		no_os_uart_remove(uart);
-		return ret;
-	}
+	no_os_uart_remove(uart);
+	if (ret) 
+		return ret;	
 #endif
 
 #ifdef VOLTAGE_OUTPUT
