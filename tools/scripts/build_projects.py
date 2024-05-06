@@ -157,11 +157,11 @@ def process_blacklist():
 	if err != 0 or (not os.path.isfile('blacklist.txt')):
 		log_err('Can not download blacklist file')
 		return blacklist
-	file = open('blacklist.txt', 'r')
-	for line in file.readlines():
-		project = line.split('#')[0].rstrip().replace('.', '_')
-		if project != '':
-			blacklist.append(project)
+	with open('blacklist.txt', 'r') as file:
+		for line in file.readlines():
+			project = line.split('#')[0].rstrip().replace('.', '_')
+			if project != '':
+				blacklist.append(project)
 	return blacklist
 
 def configfile_and_download_all_hw(_platform, noos, _builds_dir, hdl_branch):
@@ -404,10 +404,10 @@ def main():
 							run_cmd(create_dir_cmd.format(project_export_dir))
 							run_cmd("cp %s %s" %
 								(new_build.export_archive, project_export_dir))
-							file = open(os.path.join(new_build.build_dir,"tmp/arch.txt"))
-							if 'sys_mb' not in file.read(): #for sys_mb no BOOT.BIN is created
-								run_cmd("cp %s %s" %
-									(new_build.export_boot_bin, project_export_dir))
+							with open(os.path.join(new_build.build_dir,"tmp/arch.txt")) as file:
+								if 'sys_mb' not in file.read(): #for sys_mb no BOOT.BIN is created
+									run_cmd("cp %s %s" %
+										(new_build.export_boot_bin, project_export_dir))
 							binary_created = True
 						else:
 							run_cmd("cp %s %s" %

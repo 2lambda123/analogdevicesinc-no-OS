@@ -4,19 +4,18 @@ import json
 import os
 
 launch_data = {}
-
-debug_file = open(os.path.join(os.path.dirname(__file__), "debug_config"), mode="r")
-run_file = open(os.path.join(os.path.dirname(__file__), "run_config"), mode="r")
-
-binary = sys.argv[1]
-project = sys.argv[2]
-pico_sdk = sys.argv[3]
-target = sys.argv[4]
-server_path = sys.argv[5]
-gdb_path = "gdb-multiarch"
-
-run_conf = run_file.read()
-debug_conf = debug_file.read()
+with open(os.path.join(os.path.dirname(__file__), "debug_config"), mode="r") as debug_file:
+    with open(os.path.join(os.path.dirname(__file__), "run_config"), mode="r") as run_file:
+        
+        binary = sys.argv[1]
+        project = sys.argv[2]
+        pico_sdk = sys.argv[3]
+        target = sys.argv[4]
+        server_path = sys.argv[5]
+        gdb_path = "gdb-multiarch"
+        
+        run_conf = run_file.read()
+    debug_conf = debug_file.read()
 debug_conf = re.sub("BINARY", binary, debug_conf)
 run_conf = re.sub("PROJECT", project, run_conf)
 run_conf = re.sub("YYYY", target, run_conf)
