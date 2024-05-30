@@ -39,20 +39,20 @@ timestamp_match = re.search(pattern, HDL_SERVER_BASE_PATH)
 if timestamp_match:
     for hardware in unique_hardware_list:
         file_path = HDL_SERVER_BASE_PATH + '/' + hardware + '/system_top.xsa'
-        if requests.get(file_path, stream=True).status_code == 200:
+        if requests.get(file_path, stream=True, timeout=60).status_code == 200:
             os.system("mkdir -p %s" % (str(new_harware_dir) + '/' + hardware))
             os.system("wget -q -nv -P %s %s" % (str(new_harware_dir) + '/' + hardware, file_path))
         else:
             print("Missing " + hardware + " from specific timestamp " + timestamp_match.group())
 else:
-    soup = BeautifulSoup(requests.get(HDL_SERVER_BASE_PATH).content, 'html.parser')
+    soup = BeautifulSoup(requests.get(HDL_SERVER_BASE_PATH, timeout=60).content, 'html.parser')
     latest = str(soup).split("\n")[-3].split(" ")[1].split('/">')[1].split('/')[0]
     release_link = HDL_SERVER_BASE_PATH + "/" + latest + "/"
     
     for hardware in unique_hardware_list:
         FOUND = False
         file_path = release_link + hardware + "/system_top.xsa"
-        if requests.get(file_path, stream=True).status_code == 200:
+        if requests.get(file_path, stream=True, timeout=60).status_code == 200:
             os.system("mkdir -p %s" % (str(new_harware_dir) + '/' + hardware))
             os.system("wget -q -nv -P %s %s" % (str(new_harware_dir) + '/' + hardware, file_path))
             FOUND = True
@@ -64,7 +64,7 @@ else:
                 if 'href=' in line and '<pre>' not in line:
                     timestamp_folder = line.split(" ")[1].split('/">')[1].split('/')[0]
                     d_path = HDL_SERVER_BASE_PATH + "/" + timestamp_folder + "/" + hardware + "/system_top.xsa"
-                    if requests.get(d_path, stream=True).status_code == 200:
+                    if requests.get(d_path, stream=True, timeout=60).status_code == 200:
                         os.system("mkdir -p %s" % (str(new_harware_dir) + '/' + hardware))
                         os.system("wget -q -nv -P %s %s" % (str(new_harware_dir) + '/' + hardware, d_path))
                         if sys.version_info[:2] <= (3, 8):
