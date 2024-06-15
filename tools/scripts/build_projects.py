@@ -75,7 +75,7 @@ def shell_source(script):
 	settings some environment variables. Here is a way to do it.
 	"""
 
-	pipe = subprocess.Popen(". %s && env -0" % script, stdout=subprocess.PIPE, shell=True, executable="/bin/bash")
+	pipe = subprocess.Popen(". %s && env -0" % script, stdout=subprocess.PIPE, shell=False, executable="/bin/bash")
 	output = pipe.communicate()[0].decode('utf-8')
 	output = output[:-1] # fix for index out for range in 'env[ line[0] ] = line[1]'
 
